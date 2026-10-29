@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grupo Peñafiel</title>
+  <meta name="theme-color" content="#0b3c6d">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="iconos/icon-192.png">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <header class="cabecera">
+    <h1>Grupo Peñafiel</h1>
+    <p>Toca una marca para ver sus productos y precios.</p>
+  </header>
+
+  <main>
+    <div id="marcas" class="marcas"><p class="vacio">Cargando marcas…</p></div>
+  </main>
+
+  <dialog id="marca" class="ventana">
+    <button class="x" aria-label="Cerrar">×</button>
+    <div id="marca-contenido"></div>
+  </dialog>
+
+  <dialog id="video" class="ventana ventana-video">
+    <button class="x" aria-label="Cerrar video">×</button>
+    <div id="video-caja"><div id="reproductor"></div></div>
+  </dialog>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/pwa.js"></script>
+</body>
+</html>
