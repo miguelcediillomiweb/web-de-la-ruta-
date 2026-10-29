@@ -1,6 +1,6 @@
 // Service worker de Grupo Peñafiel. Su prefijo evita tocar cachés de otros proyectos.
 const PREFIJO = 'grupo-penafiel-web-';
-const CACHE = PREFIJO + 'v2';
+const CACHE = PREFIJO + 'v3';
 const BASE = ['./', 'index.html', 'css/estilos.css', 'js/config.js', 'js/app.js', 'js/pwa.js',
   'manifest.json', 'iconos/icon-192-1.png', 'iconos/icon-512-1.png'];
 
