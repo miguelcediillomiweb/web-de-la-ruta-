@@ -1,16 +1,16 @@
-// Lógica: lee el Google Sheets y arma marcas, ventana de marca y video.
+// Lógica del catálogo: lee las pestañas Marcas y Productos de Google Sheets.
 let marcas = [];
 let productos = [];
 let player = null;
 
 const $ = (s) => document.querySelector(s);
-const norm = (s) => String(s).trim().toLowerCase();
-const rutaImg = (n) => (/^https?:/.test(n) ? n : CONFIG.CARPETA_IMAGENES + n);
-const dinero = (v) =>
-  v === '' || v == null ? '—' :
+const norm = (s) => String(s ?? '').trim().toLocaleLowerCase('es-MX');
+const clave = (s) => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const rutaImg = (n) => (/^https?:/i.test(String(n)) ? String(n) : CONFIG.CARPETA_IMAGENES + String(n || '').replace(/^\//, ''));
+const dinero = (v) => v === '' || v == null ? '—' :
   isNaN(v) ? String(v) : Number(v).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
 const idYoutube = (url) => {
-  const m = String(url).match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/);
+  const m = String(url ?? '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/);
   return m ? m[1] : null;
 };
 
@@ -25,51 +25,81 @@ function h(tag, props = {}, ...kids) {
   return el;
 }
 
-async function leerHoja(nombre) {
-  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=${encodeURIComponent(nombre)}`;
-  const txt = await (await fetch(url)).text();
-  const t = JSON.parse(txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1)).table;
-  let cols = t.cols.map((c) => (c.label || '').trim());
-  let filas = t.rows;
-  if (!cols.some(Boolean) && filas.length) {
-    cols = filas[0].c.map((c) => String(c?.v ?? '').trim());
+function extraerTabla(txt, nombre) {
+  const inicio = txt.indexOf('{');
+  const fin = txt.lastIndexOf('}');
+  if (inicio < 0 || fin <= inicio) {
+    throw new Error('Google Sheets no devolvió datos JSON. Revisa que el archivo esté compartido para lectura pública.');
+  }
+  const respuesta = JSON.parse(txt.slice(inicio, fin + 1));
+  if (respuesta.status && respuesta.status !== 'ok') {
+    const detalle = respuesta.errors?.map(x => x.detailed_message || x.message).join('; ');
+    throw new Error(detalle || 'Google Sheets rechazó la consulta de la pestaña ' + nombre + '.');
+  }
+  if (!respuesta.table) throw new Error('No se encontró la pestaña "' + nombre + '".');
+  const tabla = respuesta.table;
+  let encabezados = (tabla.cols || []).map(c => String(c.label || c.id || '').trim());
+  let filas = tabla.rows || [];
+  if (!encabezados.some(Boolean) && filas.length) {
+    encabezados = (filas[0].c || []).map(c => String(c?.v ?? c?.f ?? '').trim());
     filas = filas.slice(1);
   }
-  return filas
-    .map((r) => Object.fromEntries(cols.map((n, i) => [n, r.c[i] ? r.c[i].v ?? '' : ''])))
-    .filter((f) => Object.values(f).some((v) => String(v).trim() !== ''));
+  const canon = (s) => {
+    const k = clave(s);
+    const equivalencias = {
+      marca: 'Marca', logo: 'Logo', videourl: 'Video_URL', video: 'Video_URL',
+      producto: 'Producto', presentacion: 'Presentacion',
+      preciocaja: 'Precio_Caja', precioporcaja: 'Precio_Caja',
+      piezasCaja: 'Piezas_Caja', piezasporcaja: 'Piezas_Caja',
+      preciopublico: 'Precio_Publico', preciopublico: 'Precio_Publico'
+    };
+    return equivalencias[k] || String(s || '').trim();
+  };
+  return filas.map(r => {
+    const obj = {};
+    encabezados.forEach((nombreCol, i) => {
+      const celda = r.c?.[i];
+      obj[canon(nombreCol)] = celda?.v ?? celda?.f ?? '';
+    });
+    return obj;
+  }).filter(obj => Object.values(obj).some(v => String(v).trim() !== ''));
+}
+
+async function leerHoja(nombre) {
+  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=${encodeURIComponent(nombre)}`;
+  const respuesta = await fetch(url, { cache: 'no-store' });
+  if (!respuesta.ok) throw new Error('Google Sheets respondió HTTP ' + respuesta.status + ' al leer "' + nombre + '".');
+  return extraerTabla(await respuesta.text(), nombre);
 }
 
 function logo(m, clase) {
-  const texto = () => h('span', { class: 'logo-texto' }, m.Marca);
+  const texto = () => h('span', { class: 'logo-texto' }, m.Marca || 'Marca');
   if (!m.Logo) return texto();
-  const img = h('img', { class: clase, src: rutaImg(m.Logo), alt: m.Marca, loading: 'lazy' });
+  const img = h('img', { class: clase, src: rutaImg(m.Logo), alt: m.Marca || 'Marca', loading: 'lazy' });
   img.addEventListener('error', () => img.replaceWith(texto()));
   return img;
 }
 
 const fila = (k, v, clase = '') => h('div', { class: 'fila' }, h('dt', {}, k), h('dd', { class: clase }, v));
 
-const tarjeta = (p) =>
-  h('article', { class: 'tarjeta' },
-    h('h3', {}, p.Producto),
-    h('p', { class: 'presentacion' }, p.Presentacion),
-    h('dl', {},
-      fila('Precio caja', dinero(p.Precio_Caja) + (p.Piezas_Caja ? ` (${p.Piezas_Caja} pzas)` : ''), CONFIG.BORROSO_PRECIO_CAJA ? 'borroso' : ''),
-      fila('Precio público', dinero(p.Precio_Publico))
-    )
-  );
+const tarjeta = (p) => h('article', { class: 'tarjeta' },
+  h('h3', {}, p.Producto || 'Producto'),
+  h('p', { class: 'presentacion' }, p.Presentacion || ''),
+  h('dl', {},
+    fila('Precio caja', dinero(p.Precio_Caja) + (p.Piezas_Caja ? ` (${p.Piezas_Caja} pzas)` : ''), CONFIG.BORROSO_PRECIO_CAJA ? 'borroso' : ''),
+    fila('Precio público', dinero(p.Precio_Publico))
+  )
+);
 
 function abrirMarca(m) {
-  const lista = productos.filter((p) => norm(p.Marca) === norm(m.Marca));
+  const lista = productos.filter(p => norm(p.Marca) === norm(m.Marca));
   $('#marca-contenido').replaceChildren(
     h('div', { class: 'marca-cabeza' },
       logo(m, 'logo-grande'),
       idYoutube(m.Video_URL) && h('button', { class: 'btn', onclick: () => abrirVideo(m.Video_URL) }, 'Conoce la marca')
     ),
-    lista.length
-      ? h('div', { class: 'tarjetas' }, lista.map(tarjeta))
-      : h('p', { class: 'vacio' }, 'Pronto agregaremos los productos de esta marca.')
+    lista.length ? h('div', { class: 'tarjetas' }, lista.map(tarjeta))
+      : h('p', { class: 'vacio' }, 'No hay productos registrados para esta marca en la pestaña Productos.')
   );
   $('#marca').showModal();
 }
@@ -81,11 +111,10 @@ function abrirVideo(url) {
   const crear = () => {
     if (!$('#video').open) return;
     player = new YT.Player('reproductor', {
-      videoId: id,
-      playerVars: { autoplay: 1, rel: 0, playsinline: 1 },
+      videoId: id, playerVars: { autoplay: 1, rel: 0, playsinline: 1 },
       events: {
-        onReady: (e) => e.target.playVideo(),
-        onStateChange: (e) => { if (e.data === YT.PlayerState.ENDED) $('#video').close(); }
+        onReady: e => e.target.playVideo(),
+        onStateChange: e => { if (e.data === YT.PlayerState.ENDED) $('#video').close(); }
       }
     });
   };
@@ -102,26 +131,36 @@ function limpiarVideo() {
 }
 
 function configurarVentanas() {
-  document.querySelectorAll('dialog').forEach((d) => {
+  document.querySelectorAll('dialog').forEach(d => {
     d.querySelector('.x').addEventListener('click', () => d.close());
-    d.addEventListener('click', (e) => { if (e.target === d) d.close(); });
+    d.addEventListener('click', e => { if (e.target === d) d.close(); });
   });
   $('#video').addEventListener('close', limpiarVideo);
 }
 
 async function iniciar() {
   configurarVentanas();
+  $('#marcas').replaceChildren(h('p', { class: 'vacio' }, 'Cargando marcas y productos…'));
   try {
-    [marcas, productos] = await Promise.all([leerHoja(CONFIG.HOJA_MARCAS), leerHoja(CONFIG.HOJA_PRODUCTOS)]);
+    const [datosMarcas, datosProductos] = await Promise.all([
+      leerHoja(CONFIG.HOJA_MARCAS), leerHoja(CONFIG.HOJA_PRODUCTOS)
+    ]);
+    marcas = datosMarcas.filter(m => m.Marca);
+    productos = datosProductos.filter(p => p.Producto);
+    if (!marcas.length) {
+      $('#marcas').replaceChildren(h('p', { class: 'vacio' }, 'La pestaña Marcas se leyó, pero no contiene filas con la columna "Marca". Revisa los encabezados.'));
+      return;
+    }
+    $('#marcas').replaceChildren(...marcas.map(m =>
+      h('button', { class: 'marca-btn', 'aria-label': m.Marca, onclick: () => abrirMarca(m) }, logo(m, 'logo'))
+    ));
+    if (!productos.length) console.warn('La pestaña Productos se leyó, pero no devolvió productos. Revisa el encabezado Producto.');
   } catch (e) {
-    $('#marcas').replaceChildren(h('p', { class: 'vacio' }, 'No pudimos cargar los datos. Revisa tu conexión e intenta de nuevo.'));
-    return;
+    console.error('Error al cargar el catálogo:', e);
+    $('#marcas').replaceChildren(h('p', { class: 'vacio' },
+      'No se pudieron cargar las hojas de Google Sheets. ' + (e.message || 'Revisa el ID, los nombres de pestañas y el permiso de lectura pública.')
+    ));
   }
-  marcas = marcas.filter((m) => m.Marca);
-  productos = productos.filter((p) => p.Producto);
-  $('#marcas').replaceChildren(
-    ...marcas.map((m) => h('button', { class: 'marca-btn', 'aria-label': m.Marca, onclick: () => abrirMarca(m) }, logo(m, 'logo')))
-  );
 }
 
 iniciar();
