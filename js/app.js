@@ -50,7 +50,7 @@ function extraerTabla(txt, nombre) {
       marca: 'Marca', logo: 'Logo', videourl: 'Video_URL', video: 'Video_URL',
       producto: 'Producto', presentacion: 'Presentacion',
       preciocaja: 'Precio_Caja', precioporcaja: 'Precio_Caja',
-      piezasCaja: 'Piezas_Caja', piezasporcaja: 'Piezas_Caja',
+      piezascaja: 'Piezas_Caja', piezasporcaja: 'Piezas_Caja',
       preciopublico: 'Precio_Publico', preciopublico: 'Precio_Publico'
     };
     return equivalencias[k] || String(s || '').trim();
