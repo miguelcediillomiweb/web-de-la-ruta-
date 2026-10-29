@@ -65,11 +65,47 @@ function extraerTabla(txt, nombre) {
   }).filter(obj => Object.values(obj).some(v => String(v).trim() !== ''));
 }
 
+let contadorConsulta = 0;
+
+// Google Sheets GViz se consulta mediante JSONP para evitar bloqueos CORS
+// del navegador al cargar la web desde GitHub Pages.
+function consultarGViz(url, nombre) {
+  return new Promise((resolve, reject) => {
+    const callback = '__peñafielSheets' + (++contadorConsulta);
+    const script = document.createElement('script');
+    let terminado = false;
+    const limpiar = () => {
+      if (terminado) return;
+      terminado = true;
+      clearTimeout(temporizador);
+      delete window[callback];
+      script.remove();
+    };
+    window[callback] = (respuesta) => {
+      limpiar();
+      try {
+        if (!respuesta || respuesta.status !== 'ok') {
+          const detalle = respuesta?.errors?.map(x => x.detailed_message || x.message).join('; ');
+          throw new Error(detalle || 'Google Sheets no autorizó o no encontró la pestaña "' + nombre + '".');
+        }
+        resolve(respuesta);
+      } catch (e) { reject(e); }
+    };
+    script.onerror = () => { limpiar(); reject(new Error('No se pudo conectar con Google Sheets para leer "' + nombre + '".')); };
+    const temporizador = setTimeout(() => {
+      limpiar();
+      reject(new Error('Tiempo de espera agotado al leer la pestaña "' + nombre + '". Comprueba que el archivo permita acceso a cualquier persona con el enlace.'));
+    }, 15000);
+    script.src = url + '&t=' + Date.now();
+    document.head.append(script);
+  });
+}
+
 async function leerHoja(nombre) {
-  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=${encodeURIComponent(nombre)}`;
-  const respuesta = await fetch(url, { cache: 'no-store' });
-  if (!respuesta.ok) throw new Error('Google Sheets respondió HTTP ' + respuesta.status + ' al leer "' + nombre + '".');
-  return extraerTabla(await respuesta.text(), nombre);
+  const callback = '__peñafielSheets' + (contadorConsulta + 1);
+  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:${callback}&headers=1&sheet=${encodeURIComponent(nombre)}`;
+  const respuesta = await consultarGViz(url, nombre);
+  return extraerTabla(JSON.stringify(respuesta), nombre);
 }
 
 function logo(m, clase) {
