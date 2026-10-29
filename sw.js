@@ -1,9 +1,8 @@
-// Service worker: permite instalar la web como app y abrirla aunque no haya señal.
-// Más adelante aquí mismo se conecta OneSignal (notificaciones).
+// Service worker de Grupo Peñafiel. Su prefijo evita tocar cachés de otros proyectos.
 const PREFIJO = 'grupo-penafiel-web-';
-const CACHE = PREFIJO + 'v1';
+const CACHE = PREFIJO + 'v2';
 const BASE = ['./', 'index.html', 'css/estilos.css', 'js/config.js', 'js/app.js', 'js/pwa.js',
-              'manifest.json', 'iconos/icon-192.png', 'iconos/icon-512.png'];
+  'manifest.json', 'iconos/icon-192-1.png', 'iconos/icon-512-1.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -27,13 +26,14 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     fetch(r)
       .then((res) => {
-        if (res.ok) { const copia = res.clone(); caches.open(CACHE).then((c) => c.put(r, copia)); }
+        if (res.ok) {
+          const copia = res.clone();
+          caches.open(CACHE).then((c) => c.put(r, copia));
+        }
         return res;
       })
-      .catch(() =>
-        caches.open(CACHE).then((c) =>
-          c.match(r).then((hit) => hit || (r.mode === 'navigate' ? c.match('index.html') : Response.error()))
-        )
-      )
+      .catch(() => caches.open(CACHE).then((c) =>
+        c.match(r).then((hit) => hit || (r.mode === 'navigate' ? c.match('index.html') : Response.error()))
+      ))
   );
 });
