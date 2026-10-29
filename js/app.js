@@ -71,7 +71,7 @@ let contadorConsulta = 0;
 // del navegador al cargar la web desde GitHub Pages.
 function consultarGViz(url, nombre) {
   return new Promise((resolve, reject) => {
-    const callback = '__peñafielSheets' + (++contadorConsulta);
+    const callback = '__penafielSheets' + (++contadorConsulta);
     const script = document.createElement('script');
     let terminado = false;
     const limpiar = () => {
@@ -102,7 +102,7 @@ function consultarGViz(url, nombre) {
 }
 
 async function leerHoja(nombre) {
-  const callback = '__peñafielSheets' + (contadorConsulta + 1);
+  const callback = '__penafielSheets' + (contadorConsulta + 1);
   const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:${callback}&headers=1&sheet=${encodeURIComponent(nombre)}`;
   const respuesta = await consultarGViz(url, nombre);
   return extraerTabla(JSON.stringify(respuesta), nombre);
