@@ -237,11 +237,11 @@ function buscarProductos(consulta) {
     zona.hidden = true;
     aviso.textContent = 'Escribe el nombre, sabor, presentación o marca para encontrar un producto.';
     aviso.hidden = false;
-    $('#marcas').hidden = false;
+    $('#marcas').style.display = '';
     return;
   }
 
-  $('#marcas').hidden = true;
+  $('#marcas').style.display = 'none';
   aviso.hidden = true;
   zona.hidden = false;
   if (errorProductos) {
