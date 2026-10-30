@@ -142,13 +142,14 @@ function logo(m, clase) {
 const fila = (k, v, clase = '') => h('div', { class: 'fila' }, h('dt', {}, k), h('dd', { class: clase }, v));
 
 // Agrupa variantes del mismo producto aunque cambien tamaño o envase.
-const limpiarNombreGrupo = (valor) => clave(valor)
-  .replace(/\b(?:mililitros?|ml|litros?|lts?|lt|l)\b/g, '')
-  .replace(/\b\d+(?:[.,]\d+)?\s*(?:ml|mililitros?|l|lt|lts?|litros?)\b/g, '')
-  .replace(/\b(?:lata|botella|vidrio|retornable|envase|pet|desechable|no retornable)\b/g, '')
-  .replace(/\b(?:original)\b/g, 'original')
-  .replace(/\d+/g, '')
-  .replace(/[^a-z]/g, '');
+const limpiarNombreGrupo = (valor) => {
+  const texto = String(valor ?? '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();
+  return clave(texto
+    .replace(/\\b\\d+(?:[.,]\\d+)?\\s*(?:mililitros?|ml|litros?|lts?|lt|l)\\b/g, ' ')
+    .replace(/\\b(?:lata|botella|vidrio|retornable|envase|pet|desechable|no retornable)\\b/g, ' ')
+    .replace(/\\b(?:original)\\b/g, ' original ')
+  );
+};
 
 const tamanoClave = (p) => clave([p.Producto, p.Presentacion].join(' '));
 const esSaborCitrico = (p) => /naranjada|limonada|pinada/.test(clave(p.Producto));
