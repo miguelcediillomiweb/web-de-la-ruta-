@@ -249,9 +249,14 @@ function buscarProductos(consulta) {
     return;
   }
 
-  const coincidencias = productos.filter(p => 
-    normalizarBusqueda([p.Producto, p.Presentacion, p.Marca].join(' ')).includes(q)
-  );
+  // Prioriza el nombre y la presentación del producto. Solo busca por marca
+  // cuando no hay coincidencias específicas, para que una marca no devuelva
+  // todos sus productos si el texto coincide con un producto concreto.
+  const textoProducto = (p) => normalizarBusqueda([p.Producto, p.Presentacion].join(' '));
+  const especificas = productos.filter(p => textoProducto(p).includes(q));
+  const coincidencias = especificas.length
+    ? especificas
+    : productos.filter(p => normalizarBusqueda(p.Marca).includes(q));
   if (!coincidencias.length) {
     zona.replaceChildren(h('p', { class: 'vacio' }, 'No encontramos productos con “' + consulta.trim() + '”. Prueba con otro nombre o sabor.'));
     return;
