@@ -2,6 +2,7 @@
 let marcas = [];
 let productos = [];
 let player = null;
+let errorProductos = '';
 
 const $ = (s) => document.querySelector(s);
 const norm = (s) => String(s ?? '').trim().toLocaleLowerCase('es-MX');
@@ -128,15 +129,17 @@ const tarjeta = (p) => h('article', { class: 'tarjeta' },
 );
 
 function abrirMarca(m) {
-  const lista = productos.filter(p => norm(p.Marca) === norm(m.Marca));
-  $('#marca-contenido').replaceChildren(
+  const lista = productos.filter(p => clave(p.Marca) === clave(m.Marca));
+  const contenido = [
     h('div', { class: 'marca-cabeza' },
       logo(m, 'logo-grande'),
       idYoutube(m.Video_URL) && h('button', { class: 'btn', onclick: () => abrirVideo(m.Video_URL) }, 'Conoce la marca')
-    ),
-    lista.length ? h('div', { class: 'tarjetas' }, lista.map(tarjeta))
-      : h('p', { class: 'vacio' }, 'No hay productos registrados para esta marca en la pestaña Productos.')
-  );
+    )
+  ];
+  if (errorProductos) contenido.push(h('p', { class: 'vacio' }, 'No se pudieron leer los productos: ' + errorProductos));
+  else if (lista.length) contenido.push(h('div', { class: 'tarjetas' }, lista.map(tarjeta)));
+  else contenido.push(h('p', { class: 'vacio' }, 'No hay productos registrados para esta marca en la pestaña Productos.'));
+  $('#marca-contenido').replaceChildren(...contenido);
   $('#marca').showModal();
 }
 
@@ -176,25 +179,45 @@ function configurarVentanas() {
 
 async function iniciar() {
   configurarVentanas();
-  $('#marcas').replaceChildren(h('p', { class: 'vacio' }, 'Cargando marcas y productos…'));
+  $('#marcas').replaceChildren(h('p', { class: 'vacio' }, 'Cargando marcas…'));
+
+  // Las marcas y los productos se consultan por separado: un fallo en una
+  // pestaña ya no impide mostrar la información que sí se pudo leer.
   try {
-    const [datosMarcas, datosProductos] = await Promise.all([
-      leerHoja(CONFIG.HOJA_MARCAS), leerHoja(CONFIG.HOJA_PRODUCTOS)
-    ]);
-    marcas = datosMarcas.filter(m => m.Marca);
-    productos = datosProductos.filter(p => p.Producto);
+    const datosMarcas = await leerHoja(CONFIG.HOJA_MARCAS);
+    marcas = datosMarcas.filter(m => String(m.Marca || '').trim());
     if (!marcas.length) {
-      $('#marcas').replaceChildren(h('p', { class: 'vacio' }, 'La pestaña Marcas se leyó, pero no contiene filas con la columna "Marca". Revisa los encabezados.'));
+      $('#marcas').replaceChildren(h('p', { class: 'vacio' },
+        'La pestaña Marcas se leyó, pero no contiene filas válidas en la columna Marca. Revisa el encabezado y los datos.'));
       return;
     }
     $('#marcas').replaceChildren(...marcas.map(m =>
       h('button', { class: 'marca-btn', 'aria-label': m.Marca, onclick: () => abrirMarca(m) }, logo(m, 'logo'))
     ));
-    if (!productos.length) console.warn('La pestaña Productos se leyó, pero no devolvió productos. Revisa el encabezado Producto.');
   } catch (e) {
-    console.error('Error al cargar el catálogo:', e);
+    console.error('Error al leer la pestaña Marcas:', e);
     $('#marcas').replaceChildren(h('p', { class: 'vacio' },
-      'No se pudieron cargar las hojas de Google Sheets. ' + (e.message || 'Revisa el ID, los nombres de pestañas y el permiso de lectura pública.')
+      'No se pudieron cargar las marcas. ' + (e.message || 'Revisa el ID de la hoja y el permiso de lectura pública.')
+    ));
+    return;
+  }
+
+  try {
+    const datosProductos = await leerHoja(CONFIG.HOJA_PRODUCTOS);
+    productos = datosProductos.filter(p =>
+      String(p.Producto || '').trim() && String(p.Marca || '').trim()
+    );
+    errorProductos = '';
+    if (!productos.length) {
+      errorProductos = 'La pestaña se leyó, pero no se encontraron filas con Marca y Producto. Verifica los encabezados.';
+      console.warn(errorProductos);
+      $('#marcas').append(h('p', { class: 'vacio' }, errorProductos));
+    }
+  } catch (e) {
+    errorProductos = e.message || 'No fue posible consultar la pestaña Productos.';
+    console.error('Error al leer la pestaña Productos:', e);
+    $('#marcas').append(h('p', { class: 'vacio' },
+      'Las marcas se cargaron, pero falló la lectura de Productos: ' + errorProductos
     ));
   }
 }
