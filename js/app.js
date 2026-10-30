@@ -40,21 +40,18 @@ function extraerTabla(txt, nombre) {
   if (!respuesta.table) throw new Error('No se encontró la pestaña "' + nombre + '".');
   const tabla = respuesta.table;
   const columnas = tabla.cols || [];
-  // GViz puede devolver IDs automáticos (A, B, C...) aunque la primera
-  // fila contenga los encabezados reales. En ese caso hay que usar esa fila.
   const etiquetas = columnas.map(c => String(c.label || '').trim());
-  const idsAutomaticos = columnas.length > 0 && columnas.every((c, i) => {
-    const id = String(c.id || '').trim().toUpperCase();
-    return id === String.fromCharCode(65 + i);
-  });
   let encabezados = etiquetas;
   let filas = tabla.rows || [];
-  const encabezadosVacios = !etiquetas.some(Boolean);
-  if ((encabezadosVacios || idsAutomaticos) && filas.length) {
+
+  // En GViz los IDs A, B, C son normales y NO significan que debamos
+  // descartar la primera fila de productos. Solo usamos la primera fila
+  // como encabezado cuando Google no entrega ninguna etiqueta de columna.
+  if (!etiquetas.some(Boolean) && filas.length) {
     encabezados = (filas[0].c || []).map(c => String(c?.v ?? c?.f ?? '').trim());
     filas = filas.slice(1);
-  } else {
-    encabezados = columnas.map(c => String(c.label || c.id || '').trim());
+  } else if (!etiquetas.some(Boolean)) {
+    encabezados = columnas.map(c => String(c.id || '').trim());
   }
   const canon = (s) => {
     const k = clave(s);
