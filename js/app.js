@@ -143,11 +143,11 @@ const fila = (k, v, clase = '') => h('div', { class: 'fila' }, h('dt', {}, k), h
 
 // Agrupa variantes del mismo producto aunque cambien tamaño o envase.
 const limpiarNombreGrupo = (valor) => {
-  const texto = String(valor ?? '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();
+  const texto = String(valor ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   return clave(texto
-    .replace(/\\b\\d+(?:[.,]\\d+)?\\s*(?:mililitros?|ml|litros?|lts?|lt|l)\\b/g, ' ')
-    .replace(/\\b(?:lata|botella|vidrio|retornable|envase|pet|desechable|no retornable)\\b/g, ' ')
-    .replace(/\\b(?:original)\\b/g, ' original ')
+    .replace(/\b\d+(?:[.,]\d+)?\s*(?:mililitros?|ml|litros?|lts?|lt|l)\b/g, ' ')
+    .replace(/\b(?:lata|botella|vidrio|retornable|envase|pet|desechable|no retornable)\b/g, ' ')
+    .replace(/\b(?:original)\b/g, ' original ')
   );
 };
 
