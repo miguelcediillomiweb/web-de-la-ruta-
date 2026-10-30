@@ -225,7 +225,7 @@ const tarjeta = (grupo) => {
 
 
 function normalizarBusqueda(valor) {
-  return String(valor ?? '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().trim();
+  return String(valor ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 }
 
 function buscarProductos(consulta) {
