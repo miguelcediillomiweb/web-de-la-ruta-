@@ -1,7 +1,7 @@
 // Service worker de Grupo Peñafiel. Su prefijo evita tocar cachés de otros proyectos.
 const PREFIJO = 'grupo-penafiel-web-';
-const CACHE = PREFIJO + 'v11';
-const BASE = ['./', 'index.html', 'css/estilos.css', 'js/config.js', 'js/app.js', 'js/pwa.js',
+const CACHE = PREFIJO + 'v12';
+const BASE = ['./', 'index.html', 'css/estilos.css', 'js/config.js', 'js/app.js', 'js/pwa.js', 'js/onesignal.js',
   'manifest.json', 'iconos/icon-192-1.png', 'iconos/icon-512-1.png'];
 
 self.addEventListener('install', (e) => {
