@@ -23,14 +23,17 @@
   linea('2) App ID: ' + (typeof CONFIG !== 'undefined' && CONFIG.ONESIGNAL_APP_ID ? 'ok' : 'FALTA en config.js'), typeof CONFIG === 'undefined' || !CONFIG.ONESIGNAL_APP_ID);
   linea('3) Dirección: ' + location.origin + base);
 
+  let sdkCargado = false;
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function (OneSignal) {
+    sdkCargado = true;
     linea('4) SDK de OneSignal cargó');
     try {
       await OneSignal.init({
         appId: CONFIG.ONESIGNAL_APP_ID,
         serviceWorkerPath: base.slice(1) + 'sw.js',
         serviceWorkerParam: { scope: base },
+        serviceWorkerOverrideForTypical: true,
         notifyButton: { enable: true }
       });
       linea('5) init OK');
@@ -42,7 +45,7 @@
   });
 
   setTimeout(() => {
-    if (typeof OneSignal === 'undefined') linea('4) El SDK de OneSignal NO cargó (bloqueado o sin conexión)', true);
+    if (!sdkCargado) linea('4) El SDK de OneSignal NO cargó (bloqueado o sin conexión)', true);
   }, 6000);
 
   if ('serviceWorker' in navigator) {
