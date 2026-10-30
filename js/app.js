@@ -38,21 +38,10 @@ function extraerTabla(txt, nombre) {
     throw new Error(detalle || 'Google Sheets rechazó la consulta de la pestaña ' + nombre + '.');
   }
   if (!respuesta.table) throw new Error('No se encontró la pestaña "' + nombre + '".');
+
   const tabla = respuesta.table;
   const columnas = tabla.cols || [];
-  const etiquetas = columnas.map(c => String(c.label || '').trim());
-  let encabezados = etiquetas;
-  let filas = tabla.rows || [];
-
-  // En GViz los IDs A, B, C son normales y NO significan que debamos
-  // descartar la primera fila de productos. Solo usamos la primera fila
-  // como encabezado cuando Google no entrega ninguna etiqueta de columna.
-  if (!etiquetas.some(Boolean) && filas.length) {
-    encabezados = (filas[0].c || []).map(c => String(c?.v ?? c?.f ?? '').trim());
-    filas = filas.slice(1);
-  } else if (!etiquetas.some(Boolean)) {
-    encabezados = columnas.map(c => String(c.id || '').trim());
-  }
+  const filasOriginales = tabla.rows || [];
   const canon = (s) => {
     const k = clave(s);
     const equivalencias = {
@@ -60,13 +49,38 @@ function extraerTabla(txt, nombre) {
       producto: 'Producto', presentacion: 'Presentacion',
       preciocaja: 'Precio_Caja', precioporcaja: 'Precio_Caja',
       piezascaja: 'Piezas_Caja', piezasporcaja: 'Piezas_Caja',
-      preciopublico: 'Precio_Publico', preciopublico: 'Precio_Publico'
+      preciopublico: 'Precio_Publico'
     };
     return equivalencias[k] || String(s || '').trim();
   };
-  return filas.map(r => {
+  const puntuar = (encabezados) => {
+    const nombres = encabezados.map(canon);
+    return Number(nombres.includes('Marca')) + Number(nombre !== 'Productos' || nombres.includes('Producto'));
+  };
+  const etiquetas = columnas.map(c => String(c.label || '').trim());
+  const primeraFila = (filasOriginales[0]?.c || []).map(c => String(c?.v ?? c?.f ?? '').trim());
+
+  // GViz puede entregar encabezados como labels de columnas o como primera fila.
+  // Evaluamos ambas formas y elegimos la que realmente contiene los campos esperados.
+  const candidatos = [
+    { encabezados: etiquetas, filas: filasOriginales, origen: 'labels' },
+    { encabezados: primeraFila, filas: filasOriginales.slice(1), origen: 'primera fila' }
+  ].filter(x => x.encabezados.some(Boolean));
+  candidatos.sort((a, b) => puntuar(b.encabezados) - puntuar(a.encabezados));
+  const elegido = candidatos[0];
+
+  if (!elegido || puntuar(elegido.encabezados) < 2) {
+    const muestra = filasOriginales.slice(0, 3).map(f =>
+      (f.c || []).map(c => c?.v ?? c?.f ?? '').join(' | ')
+    ).join(' / ');
+    const cols = columnas.map(c => String(c.label || c.id || '')).join(' | ');
+    throw new Error('No reconocí los encabezados de "' + nombre + '". Columnas recibidas: [' +
+      cols + ']. Primeras filas: [' + muestra + '].');
+  }
+
+  return elegido.filas.map(r => {
     const obj = {};
-    encabezados.forEach((nombreCol, i) => {
+    elegido.encabezados.forEach((nombreCol, i) => {
       const celda = r.c?.[i];
       obj[canon(nombreCol)] = celda?.v ?? celda?.f ?? '';
     });
