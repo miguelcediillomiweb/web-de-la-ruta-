@@ -2,10 +2,11 @@ importScripts('https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js');
 
 // Service worker de Grupo Peñafiel. Su prefijo evita tocar cachés de otros proyectos.
 const PREFIJO = 'grupo-penafiel-web-';
-const CACHE = PREFIJO + 'v12';
+const CACHE = PREFIJO + 'v13'; // si cambias archivos importantes, sube el número (v14, v15...)
 const BASE = ['./', 'index.html', 'css/estilos.css', 'js/config.js', 'js/app.js', 'js/pwa.js', 'js/onesignal.js',
   'manifest.json', 'iconos/icon-192-1.png', 'iconos/icon-512-1.png'];
 
+// Guarda cada archivo por separado: si falta uno, los demás se guardan igual.
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE)
@@ -14,6 +15,7 @@ self.addEventListener('install', (e) => {
   );
 });
 
+// Borra solo las versiones viejas de ESTA web; nunca toca las cachés de otros proyectos.
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys()
@@ -22,6 +24,7 @@ self.addEventListener('activate', (e) => {
   );
 });
 
+// Primero la red (siempre lo más nuevo); si no hay señal, usa lo guardado.
 self.addEventListener('fetch', (e) => {
   const r = e.request;
   if (r.method !== 'GET' || new URL(r.url).origin !== location.origin) return;
