@@ -223,6 +223,58 @@ const tarjeta = (grupo) => {
   );
 };
 
+
+function normalizarBusqueda(valor) {
+  return String(valor ?? '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().trim();
+}
+
+function buscarProductos(consulta) {
+  const q = normalizarBusqueda(consulta);
+  const zona = $('#resultados-busqueda');
+  const aviso = $('#aviso-busqueda');
+  if (!q) {
+    zona.replaceChildren();
+    zona.hidden = true;
+    aviso.textContent = 'Escribe el nombre, sabor, presentación o marca para encontrar un producto.';
+    aviso.hidden = false;
+    $('#marcas').hidden = false;
+    return;
+  }
+
+  $('#marcas').hidden = true;
+  aviso.hidden = true;
+  zona.hidden = false;
+  if (errorProductos) {
+    zona.replaceChildren(h('p', { class: 'vacio' }, 'No se pudo realizar la búsqueda: ' + errorProductos));
+    return;
+  }
+
+  const coincidencias = productos.filter(p => 
+    normalizarBusqueda([p.Producto, p.Presentacion, p.Marca].join(' ')).includes(q)
+  );
+  if (!coincidencias.length) {
+    zona.replaceChildren(h('p', { class: 'vacio' }, 'No encontramos productos con “' + consulta.trim() + '”. Prueba con otro nombre o sabor.'));
+    return;
+  }
+
+  const porMarca = new Map();
+  coincidencias.forEach(p => {
+    const key = clave(p.Marca);
+    if (!porMarca.has(key)) porMarca.set(key, { nombre: p.Marca, productos: [] });
+    porMarca.get(key).productos.push(p);
+  });
+  const bloques = [];
+  porMarca.forEach(grupo => {
+    const encabezado = h('h2', { class: 'resultado-marca' }, grupo.nombre);
+    bloques.push(h('section', { class: 'bloque-resultados' }, encabezado,
+      h('div', { class: 'tarjetas' }, agruparProductos(grupo.productos).map(tarjeta))
+    ));
+  });
+  zona.replaceChildren(h('p', { class: 'contador-resultados' },
+    coincidencias.length + (coincidencias.length === 1 ? ' presentación encontrada' : ' presentaciones encontradas')
+  ), ...bloques);
+}
+
 function abrirMarca(m) {
   const lista = productos.filter(p => clave(p.Marca) === clave(m.Marca));
   const contenido = [
@@ -274,6 +326,7 @@ function configurarVentanas() {
 
 async function iniciar() {
   configurarVentanas();
+  $('#buscador-productos').addEventListener('input', e => buscarProductos(e.target.value));
   $('#marcas').replaceChildren(h('p', { class: 'vacio' }, 'Cargando marcas…'));
 
   // Las marcas y los productos se consultan por separado: un fallo en una
