@@ -16,6 +16,15 @@
   </header>
 
   <main>
+    <section class="buscador-panel" aria-label="Buscar productos">
+      <label for="buscador-productos">🔎 ¿Qué se te antoja hoy?</label>
+      <div class="buscador-campo">
+        <span aria-hidden="true">⌕</span>
+        <input id="buscador-productos" type="search" placeholder="Busca algún producto en especial…" autocomplete="off" aria-describedby="aviso-busqueda">
+      </div>
+      <p id="aviso-busqueda" class="aviso-busqueda">Escribe el nombre, sabor, presentación o marca para encontrar un producto.</p>
+    </section>
+    <div id="resultados-busqueda" class="resultados-busqueda" hidden></div>
     <div id="marcas" class="marcas"><p class="vacio">Cargando marcas…</p></div>
   </main>
 
