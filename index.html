@@ -8,8 +8,16 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="iconos/icon-192-1.png">
   <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="css/efectos.css">
+  <script>try { if (sessionStorage.getItem('gp-cargado') === '1') document.documentElement.classList.add('sin-carga'); } catch (e) {}</script>
 </head>
 <body>
+  <div id="pantalla-carga" role="status" aria-live="polite">
+    <h2 class="carga-titulo">Grupo Peñafiel</h2>
+    <p class="carga-texto">Cargando…</p>
+    <div class="carga-barra"><span></span></div>
+  </div>
+
   <header class="cabecera">
     <h1>Grupo Peñafiel</h1>
     <p>Toca una marca para ver sus productos y precios.</p>
@@ -24,8 +32,12 @@
       </div>
       <p id="aviso-busqueda" class="aviso-busqueda">Escribe el nombre, sabor, presentación o marca para encontrar un producto.</p>
     </section>
+
     <div id="resultados-busqueda" class="resultados-busqueda" hidden></div>
-    <div id="marcas" class="marcas"><p class="vacio">Cargando marcas…</p></div>
+
+    <div id="marcas" class="marcas">
+      <p class="vacio">Cargando marcas…</p>
+    </div>
   </main>
 
   <dialog id="marca" class="ventana">
@@ -35,7 +47,9 @@
 
   <dialog id="video" class="ventana ventana-video">
     <button class="x" aria-label="Cerrar video">×</button>
-    <div id="video-caja"><div id="reproductor"></div></div>
+    <div id="video-caja">
+      <div id="reproductor"></div>
+    </div>
   </dialog>
 
   <script src="js/config.js"></script>
@@ -43,5 +57,6 @@
   <script src="js/pwa.js"></script>
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script src="js/onesignal.js"></script>
+  <script src="js/extras.js"></script>
 </body>
 </html>
