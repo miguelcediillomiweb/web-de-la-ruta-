@@ -141,14 +141,86 @@ function logo(m, clase) {
 
 const fila = (k, v, clase = '') => h('div', { class: 'fila' }, h('dt', {}, k), h('dd', { class: clase }, v));
 
-const tarjeta = (p) => h('article', { class: 'tarjeta' },
-  h('h3', {}, p.Producto || 'Producto'),
-  h('p', { class: 'presentacion' }, p.Presentacion || ''),
-  h('dl', {},
-    fila('Precio caja', dinero(p.Precio_Caja) + (p.Piezas_Caja ? ` (${p.Piezas_Caja} pzas)` : ''), CONFIG.BORROSO_PRECIO_CAJA ? 'borroso' : ''),
-    fila('Precio público', dinero(p.Precio_Publico))
-  )
-);
+// Agrupa variantes del mismo producto aunque cambien tamaño o envase.
+const limpiarNombreGrupo = (valor) => clave(valor)
+  .replace(/\b(?:mililitros?|ml|litros?|lts?|lt|l)\b/g, '')
+  .replace(/\b\d+(?:[.,]\d+)?\s*(?:ml|mililitros?|l|lt|lts?|litros?)\b/g, '')
+  .replace(/\b(?:lata|botella|vidrio|retornable|envase|pet|desechable|no retornable)\b/g, '')
+  .replace(/\b(?:original)\b/g, 'original')
+  .replace(/\d+/g, '')
+  .replace(/[^a-z]/g, '');
+
+const tamanoClave = (p) => clave([p.Producto, p.Presentacion].join(' '));
+const esSaborCitrico = (p) => /naranjada|limonada|pinada/.test(clave(p.Producto));
+
+function agruparProductos(lista) {
+  const grupos = [];
+  const mapa = new Map();
+
+  lista.forEach((p) => {
+    const base = limpiarNombreGrupo([p.Producto, p.Presentacion].join(' '));
+    const key = base || clave(p.Producto);
+    if (!mapa.has(key)) {
+      const grupo = { titulo: p.Producto || 'Producto', variantes: [] };
+      mapa.set(key, grupo);
+      grupos.push(grupo);
+    }
+    mapa.get(key).variantes.push(p);
+  });
+
+  // Los sabores surtidos de Orange Crush (naranjada, limonada y piñada)
+  // se muestran juntos cuando corresponden al mismo formato de envase/tamaño.
+  const resultado = [];
+  const surtidos = new Map();
+  grupos.forEach((g) => {
+    if (g.variantes.length === 1 && esSaborCitrico(g.variantes[0])) {
+      const p = g.variantes[0];
+      const texto = clave([p.Producto, p.Presentacion].join(' '));
+      const tamano = (texto.match(/\d+(?:\d+)?(?:ml|mililitros|l|lt|lts|litros)/) || [''])[0];
+      const envase = /vidrio|retornable/.test(texto) ? 'vidrio-retornable' :
+        /lata/.test(texto) ? 'lata' : 'otro';
+      const claveSurtido = 'saborescitrus|' + tamano + '|' + envase;
+      if (!surtidos.has(claveSurtido)) {
+        const grupo = { titulo: 'Sabores surtidos', variantes: [] };
+        surtidos.set(claveSurtido, grupo);
+        resultado.push(grupo);
+      }
+      surtidos.get(claveSurtido).variantes.push(p);
+    } else {
+      resultado.push(g);
+    }
+  });
+
+  return resultado;
+}
+
+const tarjeta = (grupo) => {
+  const variantes = grupo.variantes;
+  const nombres = [...new Set(variantes.map(p => String(p.Producto || '').trim()).filter(Boolean))];
+  const titulo = nombres.length > 1 ? (nombres.every(n => esSaborCitrico({ Producto: n }))
+    ? 'Sabores surtidos'
+    : nombres[0].replace(/\s*\d+(?:[.,]\d+)?\s*(?:ml|mililitros?|l|lt|lts|litros?)\b/ig, '').trim() || nombres[0])
+    : (variantes[0].Producto || grupo.titulo || 'Producto');
+
+  const filas = variantes.map((p) => {
+    const detalle = [p.Presentacion, p.Producto !== titulo ? p.Producto : '']
+      .map(x => String(x || '').trim()).filter(Boolean);
+    return h('div', { class: 'variante-producto' },
+      h('div', { class: 'variante-nombre' },
+        h('strong', {}, detalle.join(' · ') || p.Producto || 'Presentación')
+      ),
+      h('dl', { class: 'precios-variante' },
+        fila('Precio caja', dinero(p.Precio_Caja) + (p.Piezas_Caja ? ` (${p.Piezas_Caja} pzas)` : ''), CONFIG.BORROSO_PRECIO_CAJA ? 'borroso' : ''),
+        fila('Precio público', dinero(p.Precio_Publico))
+      )
+    );
+  });
+
+  return h('article', { class: 'tarjeta tarjeta-grupo' },
+    h('h3', {}, titulo),
+    h('div', { class: 'variantes-producto' }, filas)
+  );
+};
 
 function abrirMarca(m) {
   const lista = productos.filter(p => clave(p.Marca) === clave(m.Marca));
@@ -159,7 +231,7 @@ function abrirMarca(m) {
     )
   ];
   if (errorProductos) contenido.push(h('p', { class: 'vacio' }, 'No se pudieron leer los productos: ' + errorProductos));
-  else if (lista.length) contenido.push(h('div', { class: 'tarjetas' }, lista.map(tarjeta)));
+  else if (lista.length) contenido.push(h('div', { class: 'tarjetas' }, agruparProductos(lista).map(tarjeta)));
   else contenido.push(h('p', { class: 'vacio' }, 'No hay productos registrados para esta marca en la pestaña Productos.'));
   $('#marca-contenido').replaceChildren(...contenido);
   $('#marca').showModal();
