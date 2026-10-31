@@ -34,13 +34,13 @@
     let texto, emojis;
     if (hora >= 5 && hora < 12) {
       texto = '¡Buenos días!';
-      emojis = ['☀️', '🌻', '☕'];
+      emojis = ['☀️'];
     } else if (hora >= 12 && hora < 19) {
       texto = '¡Buenas tardes!';
-      emojis = ['🌤️', '😎', '🥤'];
+      emojis = ['🌤️'];
     } else {
       texto = '¡Buenas noches!';
-      emojis = ['🌙', '⭐', '✨'];
+      emojis = ['🌙'];
     }
     if (saludo) {
       saludo.replaceChildren();
