@@ -80,3 +80,9 @@ main { flex: 1; width: 100%; }
 .fecha-hora-portada { margin: 12px auto 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .fecha-visita, .hora-visita { margin: 0; font-weight: 600; }
 .hora-visita { font-size: 1.08rem; font-variant-numeric: tabular-nums; }
+
+
+/* Banner único de bienvenida con fecha y hora en vivo */
+.banner-saludo{margin:14px auto 0;padding:14px 18px;max-width:760px;border:1px solid rgba(255,255,255,.38);border-radius:18px;background:rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 8px 24px rgba(0,0,0,.12);backdrop-filter:blur(8px)}
+.banner-saludo p{margin:5px 0}.banner-saludo .saludo{display:flex;align-items:center;justify-content:center;gap:12px;font-size:clamp(1.15rem,4vw,1.6rem);font-weight:800}.saludo-gracias{font-weight:600}.saludo-fecha{font-size:.88rem;line-height:1.6;opacity:.95}.emoji{display:inline-block}.emoji.rebote{animation:emoji-rebote 1.8s ease-in-out infinite}.emoji.balanceo{animation:emoji-balanceo 2.3s ease-in-out infinite}.emoji.flotar{animation:emoji-flotar 2.6s ease-in-out infinite}@keyframes emoji-rebote{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes emoji-balanceo{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}@keyframes emoji-flotar{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@media(prefers-reduced-motion:reduce){.emoji,.latido{animation:none!important}}
