@@ -1,11 +1,23 @@
-/* Botón para salir y pantalla de despedida */
-.salir{margin:28px 0 0;padding:0 16px;text-align:center}.btn-salir{padding:14px 30px;border:0;border-radius:999px;cursor:pointer;color:#fff;font-size:1.05rem;font-weight:700;background:linear-gradient(90deg,#7c4dff,#1e7bc4,#00bcd4,#7c4dff);background-size:300% 100%;box-shadow:0 6px 18px #7c4dff66;animation:salir-brillo 5s linear infinite,salir-pulso 2.6s ease-in-out infinite;transition:transform .2s}
-.btn-salir .emoji{font-size:1.2em}.btn-salir.presionado{transform:scale(.92)}
-@keyframes salir-brillo{to{background-position:300% 0}}@keyframes salir-pulso{0%,100%{box-shadow:0 6px 18px #7c4dff66,0 0 0 0 #7c4dff80}50%{box-shadow:0 6px 18px #7c4dff66,0 0 0 12px #7c4dff00}}
-.despedida{position:fixed;inset:0;z-index:2147483600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center;color:#fff;overflow:hidden;background:radial-gradient(circle at 50% 35%,#1e6aa8 0%,#0b3c6d 65%,#07223f 100%);animation:despedida-entra .5s ease;transition:opacity .4s}
-.despedida.saliendo{opacity:0;pointer-events:none}.despedida>*{position:relative}.despedida h2{margin:0;font-size:clamp(1.8rem,7vw,2.6rem)}.despedida p{margin:0;max-width:30ch;font-size:clamp(1.05rem,4.2vw,1.3rem);line-height:1.45}
-.despedida-mano{font-size:4rem}.btn-volver{margin-top:10px;padding:12px 26px;border:0;border-radius:999px;background:#fff;color:#0b3c6d;font-size:1rem;font-weight:700;cursor:pointer}
-.confeti{position:absolute;inset:0;pointer-events:none}.pieza{position:absolute;left:50%;top:40%;opacity:0;animation:explota 1.8s ease-out forwards}
-@keyframes despedida-entra{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}@keyframes explota{0%{opacity:0;transform:translate(0,0) scale(.3)}15%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.1) rotate(200deg)}}
+/* Botón de salida y despedida de Grupo Peñafiel */
+.salir{margin:28px 0 0;padding:0 16px 30px;text-align:center}
+.btn-salir{padding:14px 30px;border:0;border-radius:999px;cursor:pointer;color:#fff;font-size:1.05rem;font-weight:700;background:linear-gradient(110deg,#0b3c6d,#168bd2,#13c8d4,#0b3c6d);background-size:300% 100%;box-shadow:0 6px 22px #168bd266;animation:salir-brillo 5s linear infinite,salir-pulso 2.6s ease-in-out infinite;transition:transform .2s}
+.btn-salir:active,.btn-salir.presionado{transform:scale(.91)}
+@keyframes salir-brillo{to{background-position:300% 0}}
+@keyframes salir-pulso{0%,100%{box-shadow:0 6px 22px #168bd266,0 0 0 0 #168bd455}50%{box-shadow:0 6px 22px #168bd266,0 0 0 12px #168bd400}}
+.despedida{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:24px;text-align:center;color:#fff;background:radial-gradient(ellipse at 50% 38%,#1d83bd 0%,#0b3c6d 56%,#06182c 100%);animation:despedida-entra .45s ease both}
+.despedida-contenido{position:relative;z-index:2;max-width:34rem;animation:contenido-entra .7s ease both}
+.despedida h2{margin:8px 0 14px;font-size:clamp(1.8rem,7vw,2.8rem);text-shadow:0 3px 20px #0005}
+.despedida p{margin:0 auto;max-width:30ch;font-size:clamp(1.05rem,4.2vw,1.3rem);line-height:1.5}
+.despedida-mano{font-size:clamp(3.5rem,15vw,5.5rem);transform-origin:70% 80%;animation:mano-saluda .8s ease-in-out 4}
+.despedida-ondas{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.despedida-ondas i{position:absolute;width:min(80vw,70vh);aspect-ratio:1;border:1px solid #b9f5ff80;border-radius:50%;box-shadow:0 0 35px #4bd9ff35;animation:onda 3s ease-out infinite}
+.despedida-ondas i:nth-child(2){animation-delay:1s}.despedida-ondas i:nth-child(3){animation-delay:2s}
+.confeti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.pieza{position:absolute;left:50%;top:45%;color:hsl(var(--hue),95%,70%);font-size:clamp(12px,3vw,24px);opacity:0;animation:explota 2.2s var(--delay) ease-out forwards}
 .despedida-abierta .wa-flotante,.despedida-abierta #onesignal-bell-container{display:none!important}
-@media(prefers-reduced-motion:reduce){.btn-salir,.pieza{animation:none}.pieza{opacity:1}}
+@keyframes despedida-entra{from{opacity:0}to{opacity:1}}
+@keyframes contenido-entra{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes onda{0%{transform:scale(.25);opacity:0}25%{opacity:.8}100%{transform:scale(1.8);opacity:0}}
+@keyframes mano-saluda{0%,100%{transform:rotate(0)}25%{transform:rotate(18deg)}50%{transform:rotate(-8deg)}75%{transform:rotate(14deg)}}
+@keyframes explota{0%{opacity:0;transform:translate(0,0) scale(.3)}12%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.15) rotate(240deg)}}
+@media(prefers-reduced-motion:reduce){.btn-salir,.despedida,.despedida-contenido,.despedida-mano,.despedida-ondas i,.pieza{animation:none}.pieza{opacity:.7}}
