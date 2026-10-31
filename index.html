@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Grupo Peñafiel</title>
   <meta name="theme-color" content="#0b3c6d">
+  <meta name="description" content="Consulta marcas, productos y precios de Grupo Peñafiel.">
+  <title>Grupo Peñafiel</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="iconos/icon-192-1.png">
   <link rel="stylesheet" href="css/estilos.css">
@@ -12,6 +13,8 @@
   <link rel="stylesheet" href="css/portada.css">
   <link rel="stylesheet" href="css/marca.css">
   <link rel="stylesheet" href="css/whatsapp.css">
+  <link rel="stylesheet" href="css/instalar.css">
+  <link rel="stylesheet" href="css/salir.css">
   <script>try { if (sessionStorage.getItem('gp-cargado') === '1') document.documentElement.classList.add('sin-carga'); } catch (e) {}</script>
 </head>
 <body>
@@ -22,14 +25,14 @@
   </div>
 
   <header class="cabecera">
-    <h1>Grupo Peñafiel, bienvenidos</h1>
-    <h2 class="bienvenidos">¡Bienvenidos!</h2>
-    <p id="saludo-hora" class="saludo"></p>
-    <p class="gracias-visita">Gracias por visitarnos.</p>
-    <div class="fecha-hora-portada" aria-label="Fecha y hora actual">
-      <p id="fecha-visita" class="fecha-visita">📅</p>
-      <p id="hora-visita" class="hora-visita">🕒</p>
+    <h1>Grupo Peñafiel</h1>
+    <div class="banner-saludo" aria-label="Bienvenida">
+      <p id="saludo-hora" class="saludo"></p>
+      <p class="saludo-gracias">Gracias por visitarnos.</p>
+      <p id="fecha-visita" class="saludo-fecha">📅</p>
+      <p id="hora-visita" class="saludo-fecha">🕒</p>
     </div>
+    <p class="instruccion-portada">Toca una marca para ver sus productos y precios.</p>
   </header>
 
   <main>
@@ -41,24 +44,17 @@
       </div>
       <p id="aviso-busqueda" class="aviso-busqueda">Escribe el nombre, sabor, presentación o marca para encontrar un producto.</p>
     </section>
-
     <div id="resultados-busqueda" class="resultados-busqueda" hidden></div>
-
-    <div id="marcas" class="marcas">
-      <p class="vacio">Cargando marcas…</p>
-    </div>
+    <div id="marcas" class="marcas"><p class="vacio">Cargando marcas…</p></div>
   </main>
 
   <dialog id="marca" class="ventana">
     <button class="x" aria-label="Cerrar">×</button>
     <div id="marca-contenido"></div>
   </dialog>
-
   <dialog id="video" class="ventana ventana-video">
     <button class="x" aria-label="Cerrar video">×</button>
-    <div id="video-caja">
-      <div id="reproductor"></div>
-    </div>
+    <div id="video-caja"><div id="reproductor"></div></div>
   </dialog>
 
   <script src="js/config.js"></script>
@@ -70,5 +66,7 @@
   <script src="js/portada.js"></script>
   <script src="js/marca.js"></script>
   <script src="js/whatsapp.js"></script>
+  <script src="js/instalar.js"></script>
+  <script src="js/salir.js"></script>
 </body>
 </html>
