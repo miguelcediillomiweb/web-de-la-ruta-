@@ -1,0 +1,11 @@
+/* WhatsApp flotante, tarjetas de interés y ventana de mensaje */
+.wa-flotante{position:fixed;right:16px;bottom:84px;z-index:9500;width:56px;height:56px;display:grid;place-items:center;border:0;border-radius:50%;background:#25d366;color:#fff;font-size:1.7rem;cursor:pointer;box-shadow:0 4px 14px #0004;animation:wa-pulso 2.4s ease-in-out infinite}
+.wa-contador{position:absolute;top:-4px;right:-4px;min-width:22px;height:22px;padding:0 5px;display:grid;place-items:center;border-radius:999px;background:#e53935;color:#fff;font-size:.75rem;font-weight:700}
+@keyframes wa-pulso{0%,100%{box-shadow:0 4px 14px #0004,0 0 0 0 #25d3668c}50%{box-shadow:0 4px 14px #0004,0 0 0 14px #25d36600}}
+.tarjeta{position:relative}.btn-interes{display:block;margin:0 0 10px auto;padding:6px 12px;cursor:pointer;border:1px solid #c9dfee;border-radius:999px;background:#fff;color:#0b3c6d;font-size:.85rem;font-weight:600}
+.btn-interes.activo{background:#0b3c6d;border-color:#0b3c6d;color:#fff;animation:pop-interes .35s ease}@keyframes pop-interes{50%{transform:scale(1.12)}}
+dialog.ventana.ventana-wa{width:min(460px,94vw)}.ventana-wa h2{margin:0 0 6px;color:#0b3c6d}.wa-ayuda{margin:0 0 12px;color:#5a6b7a;font-size:.9rem}
+.wa-lista-titulo{margin:0 0 6px;font-weight:700;font-size:.9rem}.wa-lista{margin:0 0 12px;padding:0;list-style:none;max-height:30vh;overflow:auto}
+.wa-lista li{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:6px 0;border-top:1px solid #e8f4fb;font-size:.9rem}.wa-quitar{flex:none;border:0;background:transparent;color:#a00000;font-size:1rem;cursor:pointer}
+.wa-vacio{margin:0 0 12px;color:#5a6b7a;font-size:.9rem}.ventana-wa textarea{width:100%;min-height:84px;margin-bottom:14px;padding:10px;border:1px solid #c9dfee;border-radius:12px;font:inherit;resize:vertical}.ventana-wa .btn{width:100%;background:#25d366}
+@media(prefers-reduced-motion:reduce){.wa-flotante,.btn-interes.activo{animation:none}}
