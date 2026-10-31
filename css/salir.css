@@ -1,0 +1,11 @@
+/* Botón para salir y pantalla de despedida */
+.salir{margin:28px 0 0;padding:0 16px;text-align:center}.btn-salir{padding:14px 30px;border:0;border-radius:999px;cursor:pointer;color:#fff;font-size:1.05rem;font-weight:700;background:linear-gradient(90deg,#7c4dff,#1e7bc4,#00bcd4,#7c4dff);background-size:300% 100%;box-shadow:0 6px 18px #7c4dff66;animation:salir-brillo 5s linear infinite,salir-pulso 2.6s ease-in-out infinite;transition:transform .2s}
+.btn-salir .emoji{font-size:1.2em}.btn-salir.presionado{transform:scale(.92)}
+@keyframes salir-brillo{to{background-position:300% 0}}@keyframes salir-pulso{0%,100%{box-shadow:0 6px 18px #7c4dff66,0 0 0 0 #7c4dff80}50%{box-shadow:0 6px 18px #7c4dff66,0 0 0 12px #7c4dff00}}
+.despedida{position:fixed;inset:0;z-index:2147483600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center;color:#fff;overflow:hidden;background:radial-gradient(circle at 50% 35%,#1e6aa8 0%,#0b3c6d 65%,#07223f 100%);animation:despedida-entra .5s ease;transition:opacity .4s}
+.despedida.saliendo{opacity:0;pointer-events:none}.despedida>*{position:relative}.despedida h2{margin:0;font-size:clamp(1.8rem,7vw,2.6rem)}.despedida p{margin:0;max-width:30ch;font-size:clamp(1.05rem,4.2vw,1.3rem);line-height:1.45}
+.despedida-mano{font-size:4rem}.btn-volver{margin-top:10px;padding:12px 26px;border:0;border-radius:999px;background:#fff;color:#0b3c6d;font-size:1rem;font-weight:700;cursor:pointer}
+.confeti{position:absolute;inset:0;pointer-events:none}.pieza{position:absolute;left:50%;top:40%;opacity:0;animation:explota 1.8s ease-out forwards}
+@keyframes despedida-entra{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}@keyframes explota{0%{opacity:0;transform:translate(0,0) scale(.3)}15%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.1) rotate(200deg)}}
+.despedida-abierta .wa-flotante,.despedida-abierta #onesignal-bell-container{display:none!important}
+@media(prefers-reduced-motion:reduce){.btn-salir,.pieza{animation:none}.pieza{opacity:1}}
