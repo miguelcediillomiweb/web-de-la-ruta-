@@ -2,7 +2,7 @@ importScripts('https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js');
 
 // Service worker de Grupo Peñafiel. Su prefijo evita tocar cachés de otros proyectos.
 const PREFIJO = 'grupo-penafiel-web-';
-const CACHE = PREFIJO + 'v17'; // si cambias archivos importantes, sube el número (v14, v15...)
+const CACHE = PREFIJO + 'v18'; // si cambias archivos importantes, sube el número (v14, v15...)
 const BASE = ['./', 'index.html', 'css/estilos.css', 'css/efectos.css', 'css/portada.css', 'css/marca.css', 'css/whatsapp.css', 'css/instalar.css', 'css/salir.css', 'js/instalar.js', 'js/salir.js', 'js/extras.js', 'js/portada.js', 'js/marca.js', 'js/whatsapp.js', 'js/config.js', 'js/app.js', 'js/pwa.js', 'js/onesignal.js',
   'manifest.json', 'iconos/icon-192-1.png', 'iconos/icon-512-1.png'];
 
