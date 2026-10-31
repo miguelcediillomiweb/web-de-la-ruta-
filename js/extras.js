@@ -90,4 +90,15 @@
     }
     document.body.append(capa);
   }
+
+  // Pie de página: únicamente créditos.
+  const pie = document.createElement('footer');
+  pie.className = 'pie';
+  const credito = document.createElement('p');
+  credito.textContent = '© ' + new Date().getFullYear() + ' Creado por Grupo Peñafiel y Ruta 1371';
+  const diseno = document.createElement('p');
+  diseno.append('Diseño web por Miguel, hecho con ', emoji('💗', 'latido'));
+  pie.append(credito, diseno);
+  const principal = document.querySelector('main');
+  if (principal) principal.after(pie); else document.body.append(pie);
 })();
