@@ -1,0 +1,45 @@
+/* ===== Portada: banner de eslóganes, banner neón y buscador de marcas ===== */
+.banner-eslogan {
+  margin: 14px auto 0; max-width: 560px; min-height: 2.4em; padding: 6px 16px;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  border-radius: 999px; font-size: .88rem; overflow: hidden;
+  background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .3);
+}
+.banner-eslogan .texto { animation: entra .6s ease; }
+.banner-eslogan b { margin-right: 4px; color: #9fe3ff; font-size: .8em; letter-spacing: .05em; text-transform: uppercase; }
+@keyframes entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.bloque-marcas { margin: 6px 0 18px; }
+.banner-neon {
+  position: relative; isolation: isolate; padding: 3px; border-radius: 18px;
+  background: linear-gradient(90deg, #00e5ff, #7c4dff, #ff2bd6, #ffd600, #00e5ff);
+  background-size: 200% 100%; animation: neon 5s linear infinite;
+}
+.banner-neon::after {
+  content: ""; position: absolute; inset: -2px; z-index: -1; border-radius: 20px;
+  background: inherit; background-size: 200% 100%; filter: blur(14px); opacity: .65;
+  animation: neon 5s linear infinite;
+}
+.banner-cristal {
+  overflow: hidden; padding: 14px 0; border-radius: 15px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, .92), rgba(222, 243, 255, .82));
+  -webkit-backdrop-filter: blur(8px) saturate(1.4); backdrop-filter: blur(8px) saturate(1.4);
+}
+.banner-pista { display: flex; width: max-content; animation: desliza 18s linear infinite; }
+.banner-pista span { padding-right: 3rem; white-space: nowrap; font-weight: 700; font-size: clamp(1rem, 4vw, 1.3rem); color: #0b3c6d; }
+@keyframes desliza { to { transform: translateX(-50%); } }
+@keyframes neon { to { background-position: 200% 0; } }
+
+.buscador-marcas {
+  display: flex; align-items: center; gap: 8px; margin: 16px 0 4px; padding: 10px 16px;
+  border: 1px solid #c9dfee; border-radius: 999px; background: #fff;
+}
+.buscador-marcas:focus-within { border-color: #0b3c6d; box-shadow: 0 0 0 3px rgba(11, 60, 109, .15); }
+.buscador-marcas input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-size: 1rem; }
+.sin-marcas { margin: 12px 0; text-align: center; color: #5a6b7a; }
+
+@media (prefers-reduced-motion: reduce) {
+  .banner-pista, .banner-neon, .banner-neon::after { animation: none; }
+  .banner-pista { width: auto; justify-content: center; }
+  .banner-pista span:nth-child(n+2) { display: none; }
+}
