@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Escuela Primaria Rafael Ramírez</title>
+  <meta name="description" content="Portal oficial de la Escuela Primaria Rafael Ramírez (CCT 15DPR082X). Avisos, calendario escolar, actividades de alumnos y contacto.">
+  <meta name="theme-color" content="#0B1B3D">
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Schoolbell&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css?v=3">
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+</head>
+<body>
+<script src="js/puerta.js?v=3"></script>
+
+  <div class="top-bar">
+    <div class="top-bar-content">
+      <div class="badge-live">Portal Escolar Oficial · CCT 15DPR082X</div>
+      <div class="fecha-hora">
+        <span id="fechaTexto"></span>
+        <span class="live-clock"><span class="emo">🕐</span> <span id="horaTexto">--:--:--</span></span>
+      </div>
+    </div>
+  </div>
+
+  <header class="banner">
+    <div class="escudo-wrap">
+      <img src="logo.png" alt="Escudo de la Escuela Primaria Rafael Ramírez">
+    </div>
+    <h1>Escuela Primaria Rafael Ramírez</h1>
+    <p class="cct">Clave de Centro de Trabajo: <strong>CCT 15DPR082X</strong></p>
+    <div class="banner-saludo">
+      <span id="saludoEmo" class="emo saludo-emo">👋</span>
+      <strong id="saludoTxt">¡Bienvenidos!</strong> · Espacio formativo para alumnos y familias
+    </div>
+  </header>
+
+  <main>
+    <section id="avisos" class="reveal">
+      <div class="sec-header">
+        <span class="sec-badge gold"><span class="emo w">📢</span> Comunicados</span>
+        <h2>Avisos Escolares</h2>
+      </div>
+
+      <div class="notif-box" id="notif">
+        <div>
+          <strong><span class="emo p">🔔</span> Recibe los avisos escolares en tu celular</strong>
+          <p id="msgNotif">Cargando servicio de notificaciones...</p>
+        </div>
+        <button class="btn-dorado" id="btnNotif" type="button" hidden>Activar Notificaciones</button>
+      </div>
+
+      <div class="pizarron">
+        <div class="pizarron-top">
+          <span>Tablón de Avisos</span>
+          <span>Ciclo Escolar</span>
+        </div>
+        <div id="avisosLista">
+          <p class="gis">Cargando avisos del pizarrón escolar...</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="calendario" class="reveal">
+      <div class="sec-header">
+        <span class="sec-badge"><span class="emo">📅</span> Agenda</span>
+        <h2>Próximas Actividades Escolares</h2>
+      </div>
+      <div id="calLista">
+        <p style="color: var(--slate-500); font-size: 0.9rem;">Cargando calendario...</p>
+      </div>
+    </section>
+
+    <section id="destacados" class="reveal">
+      <div class="sec-header">
+        <span class="sec-badge gold"><span class="emo g">⭐</span> Destacado</span>
+        <h2>Lo Más Relevante del Mes</h2>
+      </div>
+      <div id="destLista">
+        <p style="color: var(--slate-500); font-size: 0.9rem;">Cargando novedades...</p>
+      </div>
+    </section>
+
+    <section id="cumples" class="cumple-card reveal">
+      <div class="globos" aria-hidden="true"><span>🎈</span><span>🎈</span><span>🎈</span><span>🎈</span><span>🎈</span><span>🎈</span></div>
+      <div class="pastel" aria-hidden="true">
+        <i class="vela v1"><b class="llama"></b></i>
+        <i class="vela v2"><b class="llama"></b></i>
+        <i class="vela v3"><b class="llama"></b></i>
+        <div class="piso2"></div>
+        <div class="piso1"></div>
+        <div class="plato"></div>
+      </div>
+      <div class="sec-badge gold" style="display:inline-flex; margin-bottom: 8px;"><span class="emo">🎂</span> Celebración</div>
+      <h2>Este Mes Cumplen Años</h2>
+      <div id="cumpLista" class="cumples-list">
+        <span class="chip-cumple">Cargando lista de cumpleañeros...</span>
+      </div>
+      <p class="cumple-felicidades" id="felicidades" hidden>
+        <span class="emo p">🎉</span> ¡Muchas felicidades a nuestros queridos alumnos! <span class="emo w">🎉</span>
+      </p>
+    </section>
+
+    <section id="aulas" class="reveal">
+      <div class="sec-header">
+        <span class="sec-badge gold"><span class="emo">🔒</span> Privacidad</span>
+        <h2>Actividades y Evidencias por Alumno</h2>
+      </div>
+      <p style="font-size: 0.88rem; color: var(--slate-600); margin-top: 0;">
+        Selecciona al alumno(a) y escribe su fecha de nacimiento registrada para consultar sus carpetas mensuales de evidencias en Google Drive.
+      </p>
+
+      <form id="formAcceso" autocomplete="off">
+        <label for="alumno">1. Nombre del Alumno(a)</label>
+        <select id="alumno" required>
+          <option value="">Cargando padrón escolar...</option>
+        </select>
+
+        <label for="fecha2">2. Fecha de Nacimiento (DD/MM/AAAA)</label>
+        <input type="text" id="fecha2" inputmode="numeric" placeholder="Ejemplo: 15/03/2016" maxlength="10" required>
+
+        <button class="btn-inst" type="submit" id="btnEntrar"><span class="emo">📚</span> Consultar Evidencias</button>
+        <p id="msgAcceso" style="font-size: 0.85rem; font-weight: 600; min-height: 1.2em; margin-top: 8px;"></p>
+      </form>
+
+      <div id="privado" hidden>
+        <div class="aula-card">
+          <div id="avatarAlumno" class="avatar"></div>
+          <div class="aula-texto">
+            <p class="aula-pre">Te encuentras en la página de evidencias de</p>
+            <h3 id="tituloAula"></h3>
+          </div>
+          <button id="btnAvatar" type="button" class="btn-salir">📸 Mi avatar</button>
+          <button id="btnSalir" type="button" class="btn-salir">Cerrar sesión</button>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--slate-600);"><span class="emo w">📁</span> Carpetas mensuales de evidencias en Google Drive:</p>
+        <div class="grid-meses" id="carpetas"></div>
+        <h4 id="galTit" style="margin: 18px 0 8px; color: var(--navy); font-size: 1rem;" hidden><span class="emo">📸</span> Galería Fotográfica</h4>
+        <div class="grid-meses" id="galeria" hidden></div>
+      </div>
+    </section>
+
+    <section id="contacto" class="reveal">
+      <div class="sec-header">
+        <span class="sec-badge"><span class="emo w">💬</span> Atención</span>
+        <h2>Contacto Escolar</h2>
+      </div>
+      <p style="font-size: 0.88rem; color: var(--slate-600); margin-top: 0;">
+        Canal de comunicación directa con la profesora para asuntos de seguimiento escolar.
+      </p>
+      <button class="btn-wa-modern" id="btnWa" type="button" hidden>
+        <span>💬 Contactar a la Maestra Betty por WhatsApp</span>
+      </button>
+    </section>
+  </main>
+
+  <div id="visor" hidden role="dialog" aria-label="Carpeta de evidencias">
+    <div class="visor-barra">
+      <button id="visorAtras" class="btn-dorado btn-regresar" type="button"><span class="flecha">⬅️</span> Regresar</button>
+      <h3 id="visorTitulo"></h3>
+      <a id="visorDrive" class="btn-dorado" target="_blank" rel="noopener" href="#" style="font-size:0.8rem;">Drive ↗</a>
+      <button id="visorCerrar" class="btn-cerrar" type="button" aria-label="Cerrar">✖</button>
+    </div>
+    <p class="visor-ayuda">💡 Toca un archivo para verlo. Para volver a la página usa <b>Regresar</b> <span class="flecha-arriba">👆</span></p>
+    <iframe id="visorMarco" title="Contenido de Google Drive" src="about:blank"></iframe>
+  </div>
+
+  <dialog id="dlgWa">
+    <h3 style="color: var(--navy); margin-top: 0;">💬 Contactar a la Maestra Betty</h3>
+    <p style="font-size: 0.82rem; color: var(--slate-600);">
+      Por seguridad, por favor confirma al alumno(a) y su fecha de nacimiento registrada:
+    </p>
+    <form id="formWa" autocomplete="off">
+      <label for="waAlumno">Alumno(a)</label>
+      <select id="waAlumno" required></select>
+
+      <label for="waFecha">Fecha de Nacimiento (DD/MM/AAAA)</label>
+      <input type="text" id="waFecha" inputmode="numeric" placeholder="15/03/2016" maxlength="10" required>
+
+      <button class="btn-wa-modern" type="submit" id="btnWaIr" style="margin-top: 14px;">Abrir WhatsApp</button>
+      <button type="button" id="btnWaCerrar" style="width: 100%; margin-top: 8px; background: none; border: 1px solid var(--slate-200); padding: 8px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">Cancelar</button>
+      <p id="msgWa" style="font-size: 0.85rem; font-weight: 600; min-height: 1.2em; margin-top: 6px;"></p>
+    </form>
+  </dialog>
+
+  <footer>
+    <div class="corazones" aria-hidden="true"><span>❤️</span><span>❤️</span><span>❤️</span><span>❤️</span><span>❤️</span></div>
+    <img src="logo.png" alt="Escudo escolar">
+    <div class="pie-titulo">Escuela Primaria Rafael Ramírez</div>
+    <div class="pie-sub">CCT 15DPR082X</div>
+    <p class="pie-creado">Creado y diseñado por Escuela Rafael Ramírez y Maestra Betty, hecho con todo el <span class="latido" role="img" aria-label="corazón">❤️</span></p>
+  </footer>
+
+  <script src="js/perfil.js?v=3"></script>
+  <script src="js/escuela.js?v=3"></script>
+</body>
+</html>
